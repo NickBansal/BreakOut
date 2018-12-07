@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { drawPaddle } from './utils/utils'
+import { drawPaddle, drawBall } from './utils/utils'
 import './App.css';
 
 class App extends Component {
@@ -8,7 +8,11 @@ class App extends Component {
     paddleWidth: 100,
     paddleHeight: 20,
     game: false,
-    paddleX: (650-80)/2
+    paddleX: (650-80)/2,
+    ballX: 240,
+    ballY: 160, 
+    dx: 2, 
+    dy: 2
   }
 
   render() {
@@ -22,7 +26,7 @@ class App extends Component {
         ref="canvas" 
         width={650} 
         height={350} />
-        {!this.state.game && <button onClick={this.handleClick}>START</button>}
+        <button onClick={this.handleClick}>START</button>
       </div>
     );
   }
@@ -33,10 +37,30 @@ class App extends Component {
   }
   
   handleClick = () => {
-    this.setState({
-      game: true
-    })
-    this.updateCanvas(this.state.paddleX)
+    clearInterval(this.interval)
+    this.interval = setInterval(() => {
+      const ctx = this.refs.canvas.getContext('2d');
+
+      let ballX = this.state.ballX
+      let ballY = this.state.ballY
+      let dx = this.state.dx;
+      let dy = this.state.dy;
+
+      dx = ballX > 640 || ballX < 10 ? dx = -dx : dx
+      dy = ballY > 340 || ballY < 10 ? dy = -dy : dy
+      ballX += dx
+      ballY += dy
+
+      drawBall(ctx, ballX, ballY, 10)
+      
+      this.setState({
+        ballX,
+        ballY,
+        dx, 
+        dy
+      })
+
+    }, 10)
   }
 
   keyDownHandler = event => {
