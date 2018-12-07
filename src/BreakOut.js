@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { drawPaddle } from './utils/utils'
 import './App.css';
 
 class App extends Component {
 
   state = {
-    rightPressed: true, 
-    leftPressed: false,
+    paddleWidth: 100,
+    paddleHeight: 20,
     game: false,
     paddleX: (650-80)/2
   }
@@ -18,7 +19,6 @@ class App extends Component {
         <canvas 
         tabIndex='0'
         onKeyDown={(e) => this.keyDownHandler(e.key)}
-        onKeyUp={(e) => this.keyUpHandler(e.key)}
         ref="canvas" 
         width={650} 
         height={350} />
@@ -26,26 +26,27 @@ class App extends Component {
       </div>
     );
   }
-
-  drawPaddle = (ctx, paddleX) => {
-    ctx.clearRect(0, 0, 350, 650);
-    ctx.beginPath();
-    ctx.rect(this.state.paddleX, 330, 100, 20)
-    ctx.fillStyle = "#FFEECC";
-    ctx.fill();
-    ctx.closePath();
-  }
   
-  updateCanvas() {
+  updateCanvas(paddleX) {
     const ctx = this.refs.canvas.getContext('2d');
-    this.drawPaddle(ctx, this.state.paddleX)
+    drawPaddle(ctx , paddleX)
   }
   
   handleClick = () => {
     this.setState({
       game: true
     })
-    this.updateCanvas()
+    this.updateCanvas(this.state.paddleX)
+  }
+
+  keyDownHandler = event => {
+    let paddleX = this.state.paddleX
+    if (event === 'ArrowRight' && paddleX < 650 - this.state.paddleWidth) paddleX += 30;
+    if (event === 'ArrowLeft' && paddleX > 0) paddleX -= 30;
+    this.updateCanvas(paddleX)
+    this.setState({
+      paddleX
+    })
   }
 }
 
