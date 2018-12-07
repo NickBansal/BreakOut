@@ -27,19 +27,26 @@ class App extends Component {
     );
   }
 
+  drawPaddle = (ctx, paddleX) => {
+    ctx.clearRect(0, 0, 350, 650);
+    ctx.beginPath();
+    ctx.rect(this.state.paddleX, 330, 100, 20)
+    ctx.fillStyle = "#FFEECC";
+    ctx.fill();
+    ctx.closePath();
+  }
   
   updateCanvas() {
     const ctx = this.refs.canvas.getContext('2d');
-    ctx.clearRect(0, 0, 200, 200);
-    this.drawPaddle(ctx)
+    this.drawPaddle(ctx, this.state.paddleX)
   }
   
   handleClick = () => {
     this.setState({
       game: true
     })
+    this.updateCanvas()
   }
-
 }
 
 export default App;
