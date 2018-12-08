@@ -16,7 +16,6 @@ class App extends Component {
   }
 
   render() {
-
     return (
       <div className="App">
         <h1>Breakout</h1>
@@ -24,35 +23,31 @@ class App extends Component {
         tabIndex='0'
         onKeyDown={(e) => this.keyDownHandler(e.key)}
         ref="canvas" 
-        width={650} 
+        width={660} 
         height={350} />
         <button onClick={this.handleClick}>START</button>
       </div>
     );
   }
-  
-  updateCanvas(paddleX) {
-    const ctx = this.refs.canvas.getContext('2d');
-    drawPaddle(ctx , paddleX)
-  }
-  
+
   handleClick = () => {
     clearInterval(this.interval)
     this.interval = setInterval(() => {
       const ctx = this.refs.canvas.getContext('2d');
-
+      ctx.clearRect(0, 0, 660, 350);
       let ballX = this.state.ballX
       let ballY = this.state.ballY
       let dx = this.state.dx;
       let dy = this.state.dy;
-
-      dx = ballX > 640 || ballX < 10 ? dx = -dx : dx
+      let paddleX = this.state.paddleX
+      dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
       dy = ballY > 340 || ballY < 10 ? dy = -dy : dy
       ballX += dx
       ballY += dy
 
       drawBall(ctx, ballX, ballY, 10)
-      
+      drawPaddle(ctx , paddleX)
+
       this.setState({
         ballX,
         ballY,
@@ -60,14 +55,13 @@ class App extends Component {
         dy
       })
 
-    }, 10)
+    }, 5)
   }
 
   keyDownHandler = event => {
     let paddleX = this.state.paddleX
-    if (event === 'ArrowRight' && paddleX < 650 - this.state.paddleWidth) paddleX += 30;
-    if (event === 'ArrowLeft' && paddleX > 0) paddleX -= 30;
-    this.updateCanvas(paddleX)
+    if (event === 'ArrowRight' && paddleX < 660 - this.state.paddleWidth) paddleX += 60;
+    if (event === 'ArrowLeft' && paddleX > 0) paddleX -= 60;
     this.setState({
       paddleX
     })

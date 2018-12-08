@@ -8,3 +8,4 @@ This game was built in Javascript and canvas. This is my first attempt at combin
 - [x] Moving the paddle left and right
 - [x] Draw a ball on the screen
 - [x] Make the ball move 
+- [x] Make sure the ball bounces off the paddle
