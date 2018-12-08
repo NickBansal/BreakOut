@@ -41,12 +41,17 @@ class App extends Component {
       let dx = this.state.dx;
       let dy = this.state.dy;
       dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
-      dy = ballY > 340 || ballY < 10 ? dy = -dy : dy
+      dy = ballY < 10 || 
+      (ballY > 340 && (ballX > paddleX && ballX < paddleX + 100)) ? dy = -dy : dy
       ballX += dx
       ballY += dy
-
       drawBall(ctx, ballX, ballY, 10)
       drawPaddle(ctx , paddleX)
+
+      // if (y + dy > canvas.height-ballRadius) {
+      //   if (x > paddleX && x < paddleX + paddleWidth) {
+      //       dy = -dy;
+      //   }
 
       this.setState({
         ballX,
