@@ -8,7 +8,7 @@ class App extends Component {
     paddleWidth: 100,
     paddleHeight: 20,
     game: false,
-    paddleX: (650-80)/2,
+    paddleX: (660-80)/2,
     ballX: 240,
     ballY: 160, 
     dx: 2, 
@@ -35,11 +35,11 @@ class App extends Component {
     this.interval = setInterval(() => {
       const ctx = this.refs.canvas.getContext('2d');
       ctx.clearRect(0, 0, 660, 350);
+      let paddleX = this.state.paddleX
       let ballX = this.state.ballX
       let ballY = this.state.ballY
       let dx = this.state.dx;
       let dy = this.state.dy;
-      let paddleX = this.state.paddleX
       dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
       dy = ballY > 340 || ballY < 10 ? dy = -dy : dy
       ballX += dx
