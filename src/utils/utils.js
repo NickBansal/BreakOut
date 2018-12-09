@@ -28,7 +28,7 @@ export const bricksArray = () => {
 export const drawBricks = (ctx, bricks) => {
   for(let c=0; c<7; c++) {
     for(let r=0; r<3; r++) {
-      if(bricks[c][r].status === 1) {
+      if (bricks[c][r].status === 1) {
         let brickX = (c * (80 + 10)) + 20;
         let brickY = (r * (20 + 10)) + 20;
         bricks[c][r].x = brickX;
@@ -43,13 +43,15 @@ export const drawBricks = (ctx, bricks) => {
   }
 }
 
-// export const collisionDetection = (bricks, ballX, ballY) => {
-//   for(var c=0; c<7; c++) {
-//     for(var r=0; r<3; r++) {
-//       let b = bricks[c][r];
-//       if(ballX > b.x && ballX < b.x+80 && ballY > b.y && ballY < b.y+20) {
-//         return true
-//       }
-//     }
-//   }
-// }
+export const collisionDetection = (bricks, ballX, ballY) => {
+  for(var c=0; c<7; c++) {
+    for(var r=0; r<3; r++) {
+      let b = bricks[c][r];
+      if(b.status === 1 
+        && (ballX > b.x && ballX < b.x+80) 
+        && (ballY > b.y && ballY < b.y+20)) {
+        return true
+      }
+    }
+  }
+}

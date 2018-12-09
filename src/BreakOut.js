@@ -4,7 +4,7 @@ import {
   drawBall, 
   bricksArray,
   drawBricks,
-  // collisionDetection
+  collisionDetection,
 } from './utils/utils'
 import './App.css';
 
@@ -18,7 +18,7 @@ class App extends Component {
     paddleX: (660-80)/2,
     ballX: (660-80)/2,
     ballY: 330,
-    dx: -2, 
+    dx: -3, 
     dy: -2,
     score: 0
   }
@@ -64,17 +64,20 @@ class App extends Component {
         let gameOver = this.state.gameOver
         let game = this.state.game
         let bricks = this.state.bricks
+        let score = this.state.score
  
         dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
         
         dy = ballY < 10 || 
-        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) ? dy = -dy : dy
+        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) || 
+        (collisionDetection(bricks, ballX, ballY)) ? dy = -dy : dy
 
         const newBricks = bricks.map(brickCol => {
           return brickCol.map(brick => {
             if ((ballX >= brick.x && ballX < brick.x + 80) 
             && (ballY >= brick.y && ballY < brick.y + 20)) {
               brick.status = 0
+              score++
             }
             return brick
           })
@@ -98,9 +101,10 @@ class App extends Component {
           dy,
           gameOver,
           game,
-          bricks: newBricks
+          bricks: newBricks,
+          score
         })
-      }, 15)
+      }, 8)
     } else {
       this.setState({
         game: true,
