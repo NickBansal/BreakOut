@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { drawPaddle, drawBall, drawBricks } from './utils/utils'
+import { drawPaddle, drawBall, drawBricks, collisionDetection } from './utils/utils'
 import './App.css';
 
 class App extends Component {
@@ -12,6 +12,7 @@ class App extends Component {
     paddleX: (660-80)/2,
     ballX: (660-80)/2,
     ballY: 330, 
+    bricks: [],
     dx: -2, 
     dy: -2
   }
@@ -45,8 +46,10 @@ class App extends Component {
     clearInterval(this.interval)
     if (this.state.game) {
       this.interval = setInterval(() => {
+        
         const ctx = this.refs.canvas.getContext('2d');
         ctx.clearRect(0, 0, 660, 350);
+        
         let paddleX = this.state.paddleX
         let ballX = this.state.ballX
         let ballY = this.state.ballY
@@ -54,16 +57,23 @@ class App extends Component {
         let dy = this.state.dy;
         let gameOver = this.state.gameOver
         let game = this.state.game
+        
         dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
+        
         dy = ballY < 10 || 
-        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) ? dy = -dy : dy
+        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) ||
+        collisionDetection(this.state.bricks, ballX, ballY) ? dy = -dy : dy
+        
         gameOver = ballY > 350 ? true : false
         game = ballY > 350 ? false : true
+
         ballX += dx
         ballY += dy
+
         drawBall(ctx, ballX, ballY, 10)
         drawPaddle(ctx , paddleX)
-        drawBricks(ctx)
+        drawBricks(ctx, this.state.bricks)
+        
         this.setState({
           ballX,
           ballY,
@@ -72,7 +82,7 @@ class App extends Component {
           gameOver,
           game
         })
-      }, 6)
+      }, 5)
     } else {
       this.setState({
         game: true,
