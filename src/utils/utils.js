@@ -14,13 +14,18 @@ export const drawPaddle = (ctx, paddleX) => {
   ctx.closePath();
 }
 
-export const drawBricks = (ctx, bricks) => {
+export const bricksArray = () => {
+  const bricks = []
   for(let i=0; i<7; i++) {
     bricks[i] = [];
     for(let j=0; j<3; j++) {
         bricks[i][j] = { x: 0, y: 0, status: 1 };
     }
   }
+  return bricks
+}
+
+export const drawBricks = (ctx, bricks) => {
   for(let c=0; c<7; c++) {
     for(let r=0; r<3; r++) {
       if(bricks[c][r].status === 1) {
@@ -38,16 +43,13 @@ export const drawBricks = (ctx, bricks) => {
   }
 }
 
-export const collisionDetection = (bricks, ballX, ballY) => {
-  if (bricks.length < 1) return false
-  for(var c=0; c<7; c++) {
-    for(var r=0; r<3; r++) {
-      let b = bricks[c][r];
-      if(ballX > b.x && ballX < b.x+80 && ballY > b.y && ballY < b.y+20) {
-        b.status = 0;
-        return true
-      }
-    }
-  }
-}
-
+// export const collisionDetection = (bricks, ballX, ballY) => {
+//   for(var c=0; c<7; c++) {
+//     for(var r=0; r<3; r++) {
+//       let b = bricks[c][r];
+//       if(ballX > b.x && ballX < b.x+80 && ballY > b.y && ballY < b.y+20) {
+//         return true
+//       }
+//     }
+//   }
+// }

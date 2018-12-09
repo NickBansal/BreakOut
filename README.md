@@ -11,8 +11,8 @@ This game was built in Javascript and canvas. This is my first attempt at combin
 - [x] Make sure the ball bounces off the paddle
 - [x] If the ball goes off the screen - game over
 - [x] Draw bricks on the screen
-- [x] Detect if ball hits the bricks
 - [x] Remove brick if it has been hit
+- [x] Detect if ball hits the bricks
 
 ## Instructions
 In order to get this working on your local machine please check if node is installed by typing this command into your terminal

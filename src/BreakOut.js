@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
-import { drawPaddle, drawBall, drawBricks, collisionDetection } from './utils/utils'
+import { 
+  drawPaddle, 
+  drawBall, 
+  bricksArray,
+  drawBricks,
+  // collisionDetection
+} from './utils/utils'
 import './App.css';
 
 class App extends Component {
@@ -11,14 +17,14 @@ class App extends Component {
     gameOver: false,
     paddleX: (660-80)/2,
     ballX: (660-80)/2,
-    ballY: 330, 
-    bricks: [],
+    ballY: 330,
     dx: -2, 
-    dy: -2
+    dy: -2,
+    score: 0
   }
 
   render() {
-    const { gameOver, game } = this.state
+    const { gameOver, game, score } = this.state
     const style = gameOver ? { filter: 'grayscale(100%) opacity(0.2)', transition: '1s' } : null
     return (
       <div className="App">
@@ -34,7 +40,7 @@ class App extends Component {
         {!game && gameOver && 
           <div id="ResetModal">
             <h1>Game Over</h1>
-            <h2>Final Score: Score</h2>
+            <h2>Final Score: { score }</h2>
             <button onClick={this.handleClick}>RESET</button>
           </div>
         }
@@ -57,32 +63,44 @@ class App extends Component {
         let dy = this.state.dy;
         let gameOver = this.state.gameOver
         let game = this.state.game
-        
+        let bricks = this.state.bricks
+ 
         dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
         
         dy = ballY < 10 || 
-        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) ||
-        collisionDetection(this.state.bricks, ballX, ballY) ? dy = -dy : dy
-        
+        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) ? dy = -dy : dy
+
+        const newBricks = bricks.map(brickCol => {
+          return brickCol.map(brick => {
+            if ((ballX >= brick.x && ballX < brick.x + 80) 
+            && (ballY >= brick.y && ballY < brick.y + 20)) {
+              brick.status = 0
+            }
+            return brick
+          })
+        })
+  
         gameOver = ballY > 350 ? true : false
         game = ballY > 350 ? false : true
 
         ballX += dx
         ballY += dy
-
+ 
+        
         drawBall(ctx, ballX, ballY, 10)
         drawPaddle(ctx , paddleX)
-        drawBricks(ctx, this.state.bricks)
-        
+        drawBricks(ctx, newBricks)
+
         this.setState({
           ballX,
           ballY,
           dx, 
           dy,
           gameOver,
-          game
+          game,
+          bricks: newBricks
         })
-      }, 5)
+      }, 15)
     } else {
       this.setState({
         game: true,
@@ -112,6 +130,14 @@ class App extends Component {
       })
     }
   }
+
+  componentDidMount() {
+    const bricks = bricksArray()
+    this.setState({
+      bricks
+    })
+  }
+
 }
 
 export default App;
