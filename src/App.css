@@ -41,3 +41,25 @@ button:active {
   transform: translateY(4px);
   box-shadow: 1px 1px 1px black
 }
+
+#ResetModal {
+  max-height: calc(100% - 100px);
+  position: fixed;
+  top: 28%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 450px;
+  height: 250px;
+  background: rgba(0, 0, 0, 0.9);
+  color: whitesmoke;
+  animation: modalFade 0.5s 1 ease-in-out  
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1;
+  }
+}
