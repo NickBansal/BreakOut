@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { drawPaddle, drawBall } from './utils/utils'
+import { drawPaddle, drawBall, drawBricks } from './utils/utils'
 import './App.css';
 
 class App extends Component {
@@ -7,7 +7,7 @@ class App extends Component {
   state = {
     paddleWidth: 100,
     paddleHeight: 20,
-    game: false,
+    game: true,
     gameOver: false,
     paddleX: (660-80)/2,
     ballX: (660-80)/2,
@@ -63,6 +63,7 @@ class App extends Component {
         ballY += dy
         drawBall(ctx, ballX, ballY, 10)
         drawPaddle(ctx , paddleX)
+        drawBricks(ctx)
         this.setState({
           ballX,
           ballY,
