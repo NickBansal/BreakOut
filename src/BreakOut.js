@@ -1,147 +1,236 @@
 import React, { Component } from 'react';
-import { 
-  drawPaddle, 
-  drawBall, 
-  bricksArray,
-  drawBricks,
-  collisionDetection,
-} from './utils/utils'
 import './App.css';
 
 class App extends Component {
-
-  state = {
-    paddleWidth: 100,
-    paddleHeight: 20,
-    game: true,
-    gameOver: false,
-    paddleX: (660-80)/2,
-    ballX: (660-80)/2,
-    ballY: 330,
-    dx: -3, 
-    dy: -2,
-    score: 0
-  }
-
   render() {
-    const { gameOver, game, score } = this.state
-    const style = gameOver ? { filter: 'grayscale(100%) opacity(0.2)', transition: '1s' } : null
     return (
       <div className="App">
-        <h1 style={style}>Breakout</h1>
-        <canvas 
-        style={style}
-        tabIndex='0'
-        onKeyDown={(e) => this.keyDownHandler(e.key)}
-        ref="canvas" 
-        width={660} 
-        height={350} />
-        <button style={style} onClick={this.handleClick}>START</button>
-        {!game && gameOver && 
-          <div id="ResetModal">
-            <h1>Game Over</h1>
-            <h2>Final Score: { score }</h2>
-            <button onClick={this.handleClick}>RESET</button>
-          </div>
-        }
+        <h1>Breakout</h1>
+        <canvas
+          ref="canvas"
+          width={650}
+          height={450} />
       </div>
     );
   }
+  update() {
+    const Width = 650,
+      Height = 450,
+      ctx = this.refs.canvas.getContext('2d'),
+      brickWidth = (Width / 10) - 2.25,
+      colors = ["#18582b", "#0c905d", "#00c78e", "#33dbff", "#3375ff", "#5733ff"];
 
-  handleClick = () => {
-    clearInterval(this.interval)
-    if (this.state.game) {
-      this.interval = setInterval(() => {
-        
-        const ctx = this.refs.canvas.getContext('2d');
-        ctx.clearRect(0, 0, 660, 350);
-        
-        let paddleX = this.state.paddleX
-        let ballX = this.state.ballX
-        let ballY = this.state.ballY
-        let dx = this.state.dx;
-        let dy = this.state.dy;
-        let gameOver = this.state.gameOver
-        let game = this.state.game
-        let bricks = this.state.bricks
-        let score = this.state.score
- 
-        dx = ballX > 650 || ballX < 10 ? dx = -dx : dx
-        
-        dy = ballY < 10 || 
-        (ballY > 320 && (ballX > paddleX && ballX < paddleX + 100)) || 
-        (collisionDetection(bricks, ballX, ballY)) ? dy = -dy : dy
-
-        const newBricks = bricks.map(brickCol => {
-          return brickCol.map(brick => {
-            if ((ballX >= brick.x && ballX < brick.x + 80) 
-            && (ballY >= brick.y && ballY < brick.y + 20)) {
-              brick.status = 0
-              score++
-            }
-            return brick
-          })
-        })
-  
-        gameOver = ballY > 350 ? true : false
-        game = ballY > 350 ? false : true
-
-        ballX += dx
-        ballY += dy
- 
-        
-        drawBall(ctx, ballX, ballY, 10)
-        drawPaddle(ctx , paddleX)
-        drawBricks(ctx, newBricks)
-
-        this.setState({
-          ballX,
-          ballY,
-          dx, 
-          dy,
-          gameOver,
-          game,
-          bricks: newBricks,
-          score
-        })
-      }, 8)
-    } else {
-      this.setState({
-        game: true,
-        gameOver: false,
-        paddleX: (660-80)/2,
-        ballX: (660-80)/2,
-        ballY: 330, 
-        dx: -2, 
-        dy: -2
-      })
+    let ball = {
+      x: (Width / 2) - 3,
+      y: (Height / 2) - 3,
+      radius: 6,
+      speedX: 0,
+      speedY: 6
     }
-  }
+    let paddle1 = {
+      w: 100,
+      h: 10,
+      x: Width / 2 - (100 / 2),// 100 is paddle.w
+      y: Height - 10,
+      speed: 6
+    },
+      bricks = [],
+      ballOn = false,
 
-  keyDownHandler = event => {
-    let paddleX = this.state.paddleX
-    if (event === 'ArrowRight' && paddleX < 660 - this.state.paddleWidth) paddleX += 60;
-    if (event === 'ArrowLeft' && paddleX > 0) paddleX -= 60;
-    this.setState({
-      paddleX
-    })
-  }
+      // color,
+      gameOver = 0; // 1 you lost - 2 you win
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.gameOver !== this.state.gameOver && this.state.gameOver) {
-      this.setState({
-        game: false
-      })
+    function KeyListener() {
+      this.pressedKeys = [];
+      this.keydown = function (e) { this.pressedKeys[e.keyCode] = true };
+      this.keyup = function (e) { this.pressedKeys[e.keyCode] = false };
+      document.addEventListener("keydown", this.keydown.bind(this));
+      document.addEventListener("keyup", this.keyup.bind(this));
     }
+    KeyListener.prototype.isPressed = function (key) {
+      return this.pressedKeys[key] ? true : false;
+    };
+    KeyListener.prototype.addKeyPressListener =
+      function (keyCode, callback) {
+        document.addEventListener("keypress", function (e) {
+          if (e.keyCode === keyCode)
+            callback(e);
+        });
+      };
+    var keys = new KeyListener();
+
+
+    // create array 60 bricks
+    function createBricks() {
+      let brickX = 2, brickY = 10, j = 0;
+      for (var i = 0; i < 60; i++) {
+        let brick = {
+          x: brickX,
+          y: brickY,
+          w: brickWidth,
+          h: 10,
+          color: colors[j]
+        }
+        bricks.push(brick);
+        brickX += brickWidth + 2;
+        if (brickX + brickWidth + 2 > Width) {
+          brickY += 12;
+          brickX = 2;
+          j++;
+        }
+      }
+    }
+    createBricks();
+
+    // check collision !!ball must be first!!
+    function checkCollision(obj1, obj2) {
+      if (obj1 !== ball) {
+        if (obj1.y >= obj2.y &&
+          obj1.y <= obj2.y + obj2.h &&
+          obj1.x >= obj2.x &&
+          obj1.x <= obj2.x + obj2.w) {
+          return true
+        }
+      } else {
+        if (obj1.y + obj1.radius >= obj2.y &&
+          obj1.y - obj1.radius <= obj2.y + obj2.h &&
+          obj1.x - obj1.radius >= obj2.x &&
+          obj1.x + obj1.radius <= obj2.x + obj2.w) {
+          return true
+        }
+      }
+    }
+
+    // if ball touch brick destroy
+    function destroyBrick() {
+      for (var i = 0; i < bricks.length; i++) {
+        if (checkCollision(ball, bricks[i])) {
+          ball.speedY = -ball.speedY;
+          bricks.splice(i, 1);
+        }
+      }
+    }
+
+    // reset everything for a new gme
+    function newGame() {
+      bricks = [];
+      createBricks();
+      ball.x = (Width / 2) - 3;
+      ball.y = (Height / 2) - 3;
+      ball.speedX = 0;
+      ballOn = false;
+      ball = {
+        x: (Width / 2) - 3,
+        y: (Height / 2) - 3,
+        radius: 6,
+        speedX: 0,
+        speedY: 6
+      };
+      paddle1 = {
+        w: 100,
+        h: 10,
+        x: Width / 2 - (100 / 2),// 100 is paddle.w
+        y: Height - 10,
+        speed: 6
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, Width, Height)
+      ctx.fillStyle = "lightcoral";
+      ctx.fillRect(0, 0, Width, Height);
+      // paddle
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(paddle1.x, paddle1.y, paddle1.w, paddle1.h);
+
+      if (ballOn === false) {
+        ctx.font = "14px Raleway";
+        ctx.textAlign = "center";
+        ctx.fillText("Press spacebar to start a new game.", Width / 2, (Height / 2) - 25);
+        ctx.font = "14px Raleway";
+        ctx.fillText("Move with arrow keys or A & D.", Width / 2, (Height / 2) + 25);
+        if (gameOver === 1) {
+          ctx.font = "52px Raleway";
+          ctx.fillText("YOU LOST!", Width / 2, (Height / 2) - 90);
+          ctx.font = "36px Raleway";
+          ctx.fillText("Keep trying!", Width / 2, (Height / 2) - 50);
+        } else if (gameOver === 2) {
+          ctx.font = "52px Raleway";
+          ctx.fillText("YOU WON!", Width / 2, (Height / 2) - 90);
+          ctx.font = "36px Raleway";
+          ctx.fillText("Congratulations!", Width / 2, (Height / 2) - 50);
+        }
+      }
+      // ball
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fill();
+      //bricks
+      for (var i = 0; i < bricks.length; i++) {
+        ctx.fillStyle = bricks[i].color;
+        ctx.fillRect(bricks[i].x, bricks[i].y, bricks[i].w, bricks[i].h);
+      }
+    }
+
+    function move() {
+      // paddle movement
+      if (keys.isPressed(37) &&
+        paddle1.x > 0) { // LEFT
+        paddle1.x -= paddle1.speed;
+      } else if (keys.isPressed(39) &&
+        (paddle1.x + paddle1.w) < Width) { // RIGHT
+        paddle1.x += paddle1.speed;
+      }
+      // start ball on space key
+      if (keys.isPressed(32) && ballOn === false) {
+        ballOn = true;
+        gameOver = 0;
+      }
+      // ball movement
+      if (ballOn === true) {
+        ball.x += ball.speedX;
+        ball.y += ball.speedY;
+        // check ball hit ceiling
+        if (ball.y <= 0) {
+          ball.speedY = -ball.speedY;
+        }
+        // check ball hit paddle and angle
+        if (ball.y + ball.radius >= paddle1.y &&
+          ball.x - ball.radius >= paddle1.x &&
+          ball.x + ball.radius <= paddle1.x + paddle1.w) {
+          ball.speedY = -ball.speedY;
+          let deltaX = ball.x - (paddle1.x + paddle1.w / 2)
+          ball.speedX = deltaX * 0.15;
+        }
+        // check ball hit wall left-right
+        if (ball.x >= Width || ball.x <= 0) {
+          ball.speedX = -ball.speedX;
+        }
+        // check if lost
+        if (ball.y > Height) {
+          gameOver = 1;
+          newGame();
+        }
+        destroyBrick();
+        // check if win
+        if (bricks.length < 1) {
+          gameOver = 2;
+          newGame();
+        }
+      }
+    }
+
+    function loop() {
+      move();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
   }
 
   componentDidMount() {
-    const bricks = bricksArray()
-    this.setState({
-      bricks
-    })
+    this.update();
   }
-
 }
 
 export default App;
