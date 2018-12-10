@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import './App.css';
 
 class App extends Component {
+
+  state = {
+    score: 0
+  }
+
   render() {
     return (
       <div className="App">
@@ -18,7 +23,7 @@ class App extends Component {
       Height = 450,
       ctx = this.refs.canvas.getContext('2d'),
       brickWidth = (Width / 10) - 2.25,
-      colors = ["#18582b", "#0c905d", "#00c78e", "#33dbff", "#3375ff", "#5733ff"];
+      colors = ["#cd853f", "#daa520", "#ffd700", "#ffff00", "#eedd82", "#ffffe0"];
 
     let ball = {
       x: (Width / 2) - 3,
@@ -140,20 +145,16 @@ class App extends Component {
       ctx.fillStyle = "lightcoral";
       ctx.fillRect(0, 0, Width, Height);
       // paddle
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "#fffacd";
       ctx.fillRect(paddle1.x, paddle1.y, paddle1.w, paddle1.h);
 
       if (ballOn === false) {
         ctx.font = "14px Raleway";
         ctx.textAlign = "center";
         ctx.fillText("Press spacebar to start a new game.", Width / 2, (Height / 2) - 25);
-        ctx.font = "14px Raleway";
-        ctx.fillText("Move with arrow keys or A & D.", Width / 2, (Height / 2) + 25);
         if (gameOver === 1) {
           ctx.font = "52px Raleway";
           ctx.fillText("YOU LOST!", Width / 2, (Height / 2) - 90);
-          ctx.font = "36px Raleway";
-          ctx.fillText("Keep trying!", Width / 2, (Height / 2) - 50);
         } else if (gameOver === 2) {
           ctx.font = "52px Raleway";
           ctx.fillText("YOU WON!", Width / 2, (Height / 2) - 90);
